@@ -10,13 +10,13 @@
   <meta property="og:title" content="수능의 압박을 평안과 성장으로 바꾸는 마음 근력 훈련">
   <meta property="og:description" content="오디오브리프 — 수능의 압박을 평안과 성장으로. 카톡에서 바로 듣고 넘기세요.">
   <meta property="og:url" content="https://vidavida1970.github.io/suneung-mind/">
-  <meta property="og:image" content="https://vidavida1970.github.io/suneung-mind/assets/og.jpg?v=20260916b">
+  <meta property="og:image" content="https://vidavida1970.github.io/suneung-mind/assets/og.jpg?v=20260916c">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="수능의 압박을 평안과 성장으로 바꾸는 마음 근력 훈련">
-  <meta name="twitter:image" content="https://vidavida1970.github.io/suneung-mind/assets/og.jpg?v=20260916b">
-  <link rel="image_src" href="https://vidavida1970.github.io/suneung-mind/assets/og.jpg?v=20260916b">
+  <meta name="twitter:image" content="https://vidavida1970.github.io/suneung-mind/assets/og.jpg?v=20260916c">
+  <link rel="image_src" href="https://vidavida1970.github.io/suneung-mind/assets/og.jpg?v=20260916c">
   <style>
     :root { color-scheme: dark; }
     * { box-sizing: border-box; }
@@ -37,6 +37,7 @@
       font-weight: 700;
     }
     audio { width: 100%; height: 40px; display: block; }
+    .hint { display: none; margin: 8px 0 0; font-size: .78rem; opacity: .7; }
     .slide { width: 100%; display: block; height: auto; background: #1a1b1f; }
     .pager { position: sticky; bottom: 0; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); text-align: center; font-size: .75rem; background: linear-gradient(transparent, #0e0f12 40%); }
   </style>
@@ -47,9 +48,10 @@
   </header>
   <section class="brief" aria-label="오디오브리프">
     <h2>오디오브리프</h2>
-    <audio id="brief" controls preload="auto" playsinline controlslist="nodownload">
+    <audio id="brief" controls autoplay preload="auto" playsinline controlslist="nodownload">
       <source src="assets/brief.m4a" type="audio/mp4">
     </audio>
+    <p class="hint" id="hint">카톡·아이폰은 자동재생을 막아, 화면을 한 번 터치하면 바로 나옵니다.</p>
   </section>
   <main>
     <img class="slide" src="assets/p01.jpg" alt="1쪽" width="1720" height="960">
@@ -69,9 +71,33 @@
   <script>
     (function () {
       var a = document.getElementById("brief");
+      var hint = document.getElementById("hint");
       if (!a) return;
+      var started = false;
+      function tryPlay() {
+        if (started) return;
+        var p = a.play();
+        if (p && p.then) {
+          p.then(function () {
+            started = true;
+            if (hint) hint.style.display = "none";
+          }).catch(function () {
+            if (hint) hint.style.display = "block";
+          });
+        }
+      }
+      a.autoplay = true;
       a.preload = "auto";
       try { a.load(); } catch (e) {}
+      ["canplay", "canplaythrough", "loadeddata"].forEach(function (ev) {
+        a.addEventListener(ev, tryPlay);
+      });
+      document.addEventListener("DOMContentLoaded", tryPlay);
+      window.addEventListener("load", tryPlay);
+      ["pointerdown", "touchstart", "click", "scroll"].forEach(function (ev) {
+        document.addEventListener(ev, tryPlay, { capture: true, passive: true });
+      });
+      setTimeout(tryPlay, 300);
     })();
   </script>
 </body>
